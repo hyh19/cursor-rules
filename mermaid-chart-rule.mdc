@@ -1,0 +1,471 @@
+---
+alwaysApply: true
+---
+
+# Mermaid 图表绘制规范指南
+
+## 何时使用
+
+当需要绘制流程图、序列图、状态图等图表时，必须使用 Mermaid 语法实现。适用于技术文档、架构设计、流程说明等场景。
+
+## 快速检查清单
+
+在创建 Mermaid 图表时，按以下顺序快速验证：
+
+1. **语法检查**：流程图（flowchart）、饼图（pie）、ER 图（erDiagram）中中文内容是否使用双引号包裹
+2. **换行检查**：多行文本是否使用 `<br>` 标签
+3. **排版检查**：中英文之间是否有空格（参考中文排版规范）
+4. **类型检查**：是否选择了合适的图表类型
+5. **格式检查**：代码块是否使用 ` ```mermaid ` 标记
+
+## 基本要求
+
+### 必须使用 Mermaid 语法
+
+**规则**：所有图表必须使用 Mermaid 语法，禁止使用截图、外部图片链接或其他图表工具。
+
+**正确示例**：
+
+````markdown
+```mermaid
+flowchart TD
+    A["开始"] --> B["处理数据"]
+```
+````
+
+**错误示例**：
+
+```markdown
+![流程图](https://example.com/diagram.png)
+```
+
+### 代码块标记
+
+**规则**：Mermaid 代码块必须使用 ` ```mermaid ` 开始，` ``` ` 结束。
+
+**正确示例**：
+
+````markdown
+```mermaid
+flowchart TD
+    A --> B
+```
+````
+
+**错误示例**：
+
+````markdown
+```flowchart
+A --> B
+```
+````
+
+## 文本格式规范
+
+### 流程图（flowchart）、饼图（pie）、ER 图（erDiagram）中中文必须使用双引号
+
+**规则**：在流程图（flowchart）、饼图（pie）、ER 图（erDiagram）中，所有包含中文或特殊字符的文本必须使用双引号包裹。此规则适用于这三种图表类型，其他图表类型（如序列图、状态图等）不需要。
+
+**正确示例**：
+
+```mermaid
+flowchart TD
+    A["开始流程"] --> B["调用 API"]
+    C["处理数据"] --> D["结束"]
+```
+
+**错误示例**：
+
+```mermaid
+flowchart TD
+    A[开始流程] --> B[调用 API]
+    C[处理数据] --> D[结束]
+```
+
+**原因**：Mermaid 解析器在处理非 ASCII 字符时可能产生歧义，导致解析错误。此问题主要出现在流程图、饼图和 ER 图中。
+
+**饼图示例**：
+
+```mermaid
+pie title 数据分布
+    "类型 A": 40
+    "类型 B": 30
+    "类型 C": 20
+    "类型 D": 10
+```
+
+**注意**：饼图的 `title` 不需要双引号，只有数据标签需要使用双引号。
+
+**ER 图示例**：
+
+```mermaid
+erDiagram
+    "用户" ||--o{ "订单": "创建"
+    "订单" ||--|{ "订单项": "包含"
+    "用户" {
+        int id
+        string name
+    }
+```
+
+### 节点内换行使用 `<br>` 标签
+
+**规则**：节点内文字换行必须使用 `<br>` 而非 `\n`。
+
+**正确示例**：
+
+```mermaid
+flowchart TD
+    A["第一行<br>第二行"] --> B["步骤 1<br>步骤 2"]
+```
+
+**错误示例**：
+
+```mermaid
+flowchart TD
+    A["第一行\n第二行"] --> B["步骤 1\n步骤 2"]
+```
+
+**原因**：在 Mermaid 中，`\n` 可能不被正确解析，而 HTML 标签 `<br>` 能确保跨平台一致的换行效果。
+
+## 中英文混排规范
+
+**规则**：图表中的文字说明必须遵循中文排版规范。
+
+**关键要点**：
+
+- 中英文之间需要空格：`使用 Mermaid 绘制流程图`（正确）vs `使用Mermaid绘制流程图`（错误）
+- 中文与数字之间需要空格：`共有 3 种状态`（正确）vs `共有3种状态`（错误）
+- 使用全角中文标点：`流程结束。`（正确）vs `流程结束.`（错误）
+- 专有名词正确大小写：`GitHub`（正确）vs `github`（错误）
+
+**示例**：
+
+```mermaid
+flowchart TD
+    A["使用 GitHub Actions<br>进行 CI/CD"] --> B["部署到生产环境"]
+    C["处理 100 个请求"] --> D["返回 JSON 数据"]
+```
+
+## 图表类型选择
+
+根据内容选择合适的图表类型，每种类型都有其特定用途：
+
+### 流程图（flowchart）
+
+**用途**：表示工作流程、算法流程、决策树。
+
+**最小示例**：
+
+```mermaid
+flowchart TD
+    Start["开始"] --> Decision{"是否满足条件?"}
+    Decision -->|是| Action1["执行操作 1"]
+    Decision -->|否| Action2["执行操作 2"]
+    Action1 --> End["结束"]
+    Action2 --> End
+```
+
+### 序列图（sequence diagram）
+
+**用途**：表示对象间的交互、API 调用时序。
+
+**最小示例**：
+
+```mermaid
+sequenceDiagram
+    participant A as 客户端
+    participant B as 服务器
+    A->>B: 发送请求
+    B-->>A: 返回响应
+```
+
+### 状态图（state diagram）
+
+**用途**：表示状态转换、状态机。
+
+**最小示例**：
+
+```mermaid
+stateDiagram-v2
+    [*] --> 待处理
+    待处理 --> 处理中: 开始处理
+    处理中 --> 已完成: 处理完成
+    处理中 --> 失败: 处理失败
+    已完成 --> [*]
+    失败 --> [*]
+```
+
+### 类图（class diagram）
+
+**用途**：表示系统结构、类关系、UML 类图。
+
+**最小示例**：
+
+```mermaid
+classDiagram
+    class User {
+        +String name
+        +login()
+    }
+    class Order {
+        +int id
+        +create()
+    }
+    User --> Order : creates
+```
+
+### 甘特图（gantt）
+
+**用途**：表示项目计划、时间线、任务排期。
+
+**最小示例**：
+
+```mermaid
+gantt
+    title 项目计划
+    dateFormat YYYY-MM-DD
+    section 阶段 1
+    任务 1: 2024-01-01, 7d
+    任务 2: 2024-01-08, 5d
+```
+
+### 饼图（pie）
+
+**用途**：表示比例数据、统计数据。
+
+**最小示例**：
+
+```mermaid
+pie title 数据分布
+    "类型 A": 40
+    "类型 B": 30
+    "类型 C": 20
+    "类型 D": 10
+```
+
+### ER 图（ER diagram）
+
+**用途**：表示数据模型关系、数据库设计。
+
+**最小示例**：
+
+```mermaid
+erDiagram
+    "用户" ||--o{ "订单": "创建"
+    "订单" ||--|{ "订单项": "包含"
+    "用户" {
+        int id
+        string name
+    }
+```
+
+## 常见错误与修正
+
+### 错误 1：流程图（flowchart）、饼图（pie）、ER 图（erDiagram）中中文未使用双引号
+
+**错误代码**：
+
+```mermaid
+flowchart TD
+    A[开始] --> B[结束]
+```
+
+**修正**：
+
+```mermaid
+flowchart TD
+    A["开始"] --> B["结束"]
+```
+
+**饼图错误示例**：
+
+```mermaid
+pie title 数据分布
+    类型 A: 40
+    类型 B: 30
+```
+
+**饼图修正**：
+
+```mermaid
+pie title 数据分布
+    "类型 A": 40
+    "类型 B": 30
+```
+
+**ER 图错误示例**：
+
+```mermaid
+erDiagram
+    用户 ||--o{ 订单: 创建
+    订单 ||--|{ 订单项: 包含
+```
+
+**ER 图修正**：
+
+```mermaid
+erDiagram
+    "用户" ||--o{ "订单": "创建"
+    "订单" ||--|{ "订单项": "包含"
+```
+
+### 错误 2：使用 `\n` 换行
+
+**错误代码**：
+
+```mermaid
+flowchart TD
+    A["第一行\n第二行"] --> B
+```
+
+**修正**：
+
+```mermaid
+flowchart TD
+    A["第一行<br>第二行"] --> B
+```
+
+### 错误 3：中英文之间缺少空格
+
+**错误代码**：
+
+```mermaid
+flowchart TD
+    A["使用GitHub进行部署"] --> B
+```
+
+**修正**：
+
+```mermaid
+flowchart TD
+    A["使用 GitHub 进行部署"] --> B
+```
+
+### 错误 4：选择了错误的图表类型
+
+**错误场景**：用流程图表示对象交互。
+
+**错误代码**：
+
+```mermaid
+flowchart TD
+    A["客户端"] --> B["服务器"]
+    B --> A
+```
+
+**修正**：使用序列图。
+
+```mermaid
+sequenceDiagram
+    participant A as 客户端
+    participant B as 服务器
+    A->>B: 发送请求
+    B-->>A: 返回响应
+```
+
+## 样式与格式最佳实践
+
+### 节点标识
+
+**规则**：使用清晰的节点标识和描述性标签。
+
+**示例**：
+
+```mermaid
+flowchart TD
+    Start["开始"] --> Validate["验证输入"]
+    Validate -->|"有效"| Process["处理数据"]
+    Validate -->|"无效"| Error["显示错误"]
+```
+
+### 保持简洁
+
+**规则**：避免过度复杂的图表，单个图表节点数建议不超过 20 个。
+
+**建议**：将复杂流程拆分为多个子图。
+
+### 使用一致的样式
+
+**规则**：同一文档中的图表应使用一致的样式和颜色方案。
+
+**示例**：
+
+```mermaid
+flowchart TD
+    A["开始"]:::start
+    B["处理"]:::process
+    C["结束"]:::endNode
+
+    classDef start fill:#90EE90
+    classDef process fill:#87CEEB
+    classDef endNode fill:#FFB6C1
+```
+
+## 注释与说明
+
+### 图表前添加说明
+
+**规则**：在 Mermaid 代码块前添加必要的说明文字，解释图表用途。
+
+**示例**：
+
+````markdown
+以下流程图展示了用户登录的完整流程：
+
+```mermaid
+flowchart TD
+    A["输入用户名密码"] --> B["验证凭证"]
+    B -->|"成功"| C["跳转首页"]
+    B -->|"失败"| D["显示错误信息"]
+```
+````
+
+### 复杂图表添加图例
+
+**规则**：复杂图表应在图表下方补充图例或说明。
+
+**示例**：
+
+````markdown
+```mermaid
+flowchart TD
+    A --> B
+    B --> C
+```
+
+**图例说明**：
+
+- 节点 A：初始状态
+- 节点 B：中间处理
+- 节点 C：最终状态
+````
+
+## 快速参考
+
+### 常用语法速查
+
+| 图表类型 | 语法关键字 | 用途 |
+| ------ | -------- | ---- |
+| 流程图 | `flowchart TD/LR` | 工作流程、算法 |
+| 序列图 | `sequenceDiagram` | 对象交互、API 调用 |
+| 状态图 | `stateDiagram-v2` | 状态转换 |
+| 类图 | `classDiagram` | 系统结构、UML |
+| 甘特图 | `gantt` | 项目计划 |
+| 饼图 | `pie` | 比例数据 |
+| ER 图 | `erDiagram` | 数据模型 |
+
+### 节点形状速查
+
+| 语法 | 形状 | 示例 |
+| --- | --- | --- |
+| `A["文本"]` | 矩形（默认） | `A["开始"]` |
+| `A{"文本"}` | 菱形（决策） | `A{"是否满足?"}` |
+| `A(("文本"))` | 圆形 | `A(("结束"))` |
+| `A[("文本")]` | 圆角矩形 | `A[("处理")]` |
+
+## 参考资料
+
+- [Mermaid 官方文档](https://mermaid-js.github.io/mermaid/#/)
+- [Mermaid 在线编辑器](https://mermaid-js.github.io/mermaid-live-editor)
+- [Markdown 中使用 Mermaid 的最佳实践](https://mermaid-js.github.io/mermaid/#/integrations)

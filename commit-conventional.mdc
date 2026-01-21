@@ -1,0 +1,377 @@
+---
+alwaysApply: true
+---
+
+# Commit with Conventional Commits
+
+## Overview
+
+This command instructs the AI Agent to analyze **staged git changes only**, generate commit messages following the Conventional Commits 1.0.0 specification, and commit the staged changes. Use this command when you want to create standardized, semantic commit messages that align with Semantic Versioning.
+
+**Important**: This command only commits changes that are already staged. If you have unstaged changes, stage them first using `git add` before running this command.
+
+**When to use this command**: When you need to commit staged changes with properly formatted commit messages that follow the Conventional Commits specification.
+
+## Process Steps
+
+1. **Check staged changes**
+   - Run `git status` to check if there are any staged changes
+   - Run `git diff --cached` to see detailed changes in staged files
+   - If no staged changes exist, inform the user that they need to stage changes first using `git add`
+   - Identify all staged modified, added, deleted, and renamed files
+
+2. **Analyze changes to determine commit type**
+   - Review the diff output to understand what changed
+   - Categorize changes based on the type of modification
+   - Determine if changes affect multiple areas (consider splitting into multiple commits)
+   - Identify if changes introduce breaking changes
+
+3. **Generate commit message following Conventional Commits spec**
+   - Select appropriate commit type (`feat`, `fix`, `docs`, etc.)
+   - Determine if scope is needed and appropriate
+   - Write description in imperative mood
+   - Add body if changes are complex or need explanation
+   - Include breaking change indicators if applicable
+
+4. **Commit staged changes**
+   - Verify that there are staged changes (if none, inform the user to stage changes first)
+   - Commit the staged changes with the generated message using `git commit -m "message"` or `git commit` for multi-line messages
+   - Do not stage any files - only commit what is already staged
+   - If user provided additional context, incorporate it into the commit message appropriately
+
+## Commit Message Format
+
+Structure commit messages as follows:
+
+```text
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+### Format Rules
+
+1. **Type prefix**: Always prefix commits with a type (`feat`, `fix`, etc.), followed by an optional scope, optional `!`, and a required colon and space.
+
+2. **Scope**: Provide a scope after the type when appropriate. The scope must be a noun describing a section of the codebase surrounded by parentheses, e.g., `fix(parser):` or `feat(api):`.
+
+3. **Description**: Immediately follow the colon and space with a short summary of the code changes. Use imperative mood, e.g., "add feature" not "added feature" or "adds feature". Keep it concise (50-72 characters recommended).
+
+4. **Body**: Provide a longer commit body after the short description, separated by one blank line. The body provides additional contextual information about the code changes and may consist of any number of newline-separated paragraphs.
+
+5. **Footers**: Provide one or more footers one blank line after the body. Each footer must consist of:
+   - A word token (use `-` in place of whitespace characters, e.g., `Acked-by`, `Reviewed-by`)
+   - Either a `:<space>` or `<space>#` separator
+   - A string value
+
+   The exception is `BREAKING CHANGE`, which may be used as a token without hyphens.
+
+6. **Case sensitivity**: Treat commit message components as case-insensitive, except `BREAKING CHANGE` which must be uppercase. `BREAKING-CHANGE` is synonymous with `BREAKING CHANGE` when used as a footer token.
+
+## Commit Type Selection Guide
+
+### Required Types
+
+- **`feat:`** Use when a commit adds a new feature to the application or library (correlates with `MINOR` in Semantic Versioning).
+
+- **`fix:`** Use when a commit represents a bug fix (correlates with `PATCH` in Semantic Versioning).
+
+### Common Optional Types
+
+- **`build:`** Changes to build system or external dependencies (e.g., npm, webpack, gulp)
+- **`chore:`** Changes that don't modify src or test files (e.g., updating .gitignore, formatting)
+- **`ci:`** Changes to CI configuration files and scripts (e.g., GitHub Actions, CircleCI)
+- **`docs:`** Documentation only changes (e.g., README, comments, API docs)
+- **`style:`** Code style changes (formatting, missing semicolons, whitespace, etc.) that don't affect code meaning
+- **`refactor:`** Code changes that neither fix a bug nor add a feature (restructuring without changing behavior)
+- **`perf:`** Performance improvements
+- **`test:`** Adding or updating tests (no production code changes)
+
+### How to Determine Commit Type
+
+Analyze the changes to determine the appropriate type:
+
+- **New functionality** → `feat:`
+- **Bug fixes** → `fix:`
+- **Documentation updates** → `docs:`
+- **Code formatting/style** → `style:`
+- **Refactoring** → `refactor:`
+- **Performance improvements** → `perf:`
+- **Test additions/changes** → `test:`
+- **Build system changes** → `build:`
+- **CI/CD changes** → `ci:`
+- **Maintenance tasks** → `chore:`
+
+**Note**: If a commit conforms to more than one commit type, split it into multiple commits whenever possible. This helps maintain organized commit history.
+
+## Scope Guidelines
+
+Use scope when the change affects a specific area of the codebase:
+
+- **When to use scope**: When the change is limited to a specific module, component, or subsystem
+- **Scope format**: Use a noun in parentheses, e.g., `feat(api):`, `fix(parser):`, `docs(readme):`
+- **Common scopes**: `api`, `auth`, `ui`, `parser`, `router`, `database`, `config`, etc.
+- **When to omit scope**: When the change affects multiple areas or the entire codebase
+
+**Examples**:
+
+- `feat(api): add user authentication endpoint`
+- `fix(parser): handle null values correctly`
+- `docs(readme): update installation instructions`
+
+## Description Guidelines
+
+The description is the most important part of the commit message:
+
+1. **Use imperative mood**: Write as if completing the sentence "This commit will..."
+   - ✅ Correct: "add user authentication"
+   - ❌ Wrong: "added user authentication" or "adds user authentication"
+
+2. **Be concise**: Keep the first line to 50-72 characters when possible
+   - Focus on what changed, not why (use body for why)
+
+3. **Be specific**: Clearly describe what the commit does
+   - ✅ Good: "fix memory leak in data processor"
+   - ❌ Bad: "fix bug" or "update code"
+
+4. **Don't end with period**: The description should not end with a period
+
+5. **Use lowercase**: Start with lowercase letter (unless it's a proper noun)
+
+## Breaking Changes
+
+Breaking changes must be indicated in one of two ways:
+
+1. **In the type/scope prefix**: Add a `!` immediately before the `:`, e.g., `feat!:` or `feat(api)!:`
+
+2. **In the footer**: Use `BREAKING CHANGE:` followed by a colon, space, and description
+
+If `!` is used in the prefix, the `BREAKING CHANGE:` footer may be omitted, and the commit description should describe the breaking change.
+
+Breaking changes correlate with `MAJOR` in Semantic Versioning and can be part of commits of any type.
+
+### When to Mark Breaking Changes
+
+Mark as breaking when:
+
+- API contracts change
+- Function signatures change in incompatible ways
+- Configuration formats change
+- Database schemas change in incompatible ways
+- Any change that requires users to modify their code or configuration
+
+**Examples**:
+
+- `feat!: change API endpoint structure`
+- `feat(api)!: remove deprecated authentication method`
+- `chore!: drop support for Node 6`
+
+## SemVer Relationship
+
+Understanding how commit types relate to versioning:
+
+- `fix` type commits → `PATCH` releases (1.0.0 → 1.0.1)
+- `feat` type commits → `MINOR` releases (1.0.0 → 1.1.0)
+- Commits with `BREAKING CHANGE` (any type) → `MAJOR` releases (1.0.0 → 2.0.0)
+
+## Examples
+
+### Simple Feature Commit
+
+```text
+feat: add user authentication
+```
+
+### Feature with Scope
+
+```text
+feat(api): add user authentication endpoint
+```
+
+### Fix with Scope
+
+```text
+fix(parser): handle null response gracefully
+```
+
+### Breaking Change with Exclamation
+
+```text
+feat!: change API endpoint structure
+```
+
+### Breaking Change with Footer
+
+```text
+feat: allow provided config object to extend other configs
+
+BREAKING CHANGE: `extends` key in config file is now used for extending other config files
+```
+
+### Commit with Body
+
+```text
+fix: prevent racing of requests
+
+Introduce a request id and a reference to latest request. Dismiss
+incoming responses other than from latest request.
+
+Remove timeouts which were used to mitigate the racing issue but are
+obsolete now.
+```
+
+### Commit with Multiple Footers
+
+```text
+fix: prevent racing of requests
+
+Introduce a request id and a reference to latest request.
+
+Reviewed-by: Z
+Refs: #123
+```
+
+### Documentation Commit
+
+```text
+docs: correct spelling of CHANGELOG
+```
+
+### Revert Commit
+
+```text
+revert: let us never again speak of the noodle incident
+
+Refs: 676104e, a215868
+```
+
+### Style Commit
+
+```text
+style: format code with prettier
+```
+
+### Refactor Commit
+
+```text
+refactor: extract authentication logic into separate module
+```
+
+### Performance Commit
+
+```text
+perf: optimize database query performance
+```
+
+### Test Commit
+
+```text
+test: add unit tests for user service
+```
+
+### Build Commit
+
+```text
+build: update webpack to version 5
+```
+
+### CI Commit
+
+```text
+ci: add GitHub Actions workflow for testing
+```
+
+### Chore Commit
+
+```text
+chore: update .gitignore to exclude node_modules
+```
+
+## Edge Cases and Guidelines
+
+### Multiple Commit Types
+
+If a commit conforms to more than one commit type, split it into multiple commits whenever possible. This helps maintain organized commit history.
+
+### Type Casing
+
+Any casing may be used for types, but be consistent throughout the project. The specification treats types as case-insensitive, but consistency improves readability.
+
+### Initial Development Phase
+
+Proceed as if you've already released the product. Even during initial development, maintain clear commit messages as team members and tools rely on this information.
+
+### Wrong Commit Type
+
+If you used the wrong type before merging or releasing, use `git rebase -i` to edit the commit history. If a commit doesn't meet the specification, it will simply be missed by tools based on the spec.
+
+## Git Workflow Instructions
+
+When executing this command, follow these specific steps:
+
+1. **Check staged changes**:
+
+   ```bash
+   git status
+   git diff --cached
+   ```
+
+   **Important**: Only check staged changes. If there are no staged changes, inform the user that they need to stage changes first using `git add` before proceeding.
+
+2. **Analyze staged changes**:
+   - Review only the staged file changes (from `git diff --cached`)
+   - Identify the primary purpose of the staged changes
+   - Determine if staged changes should be split into multiple commits
+   - Check for breaking changes
+
+3. **Generate commit message**:
+   - Select appropriate type based on staged change analysis
+   - Add scope if change is limited to specific area
+   - Write imperative description
+   - Add body if context is needed
+   - Include breaking change indicators if applicable
+
+4. **Verify staged changes exist**:
+   - Before committing, verify that there are staged changes
+   - If no staged changes exist, inform the user: "No staged changes found. Please stage your changes using `git add` before running this command."
+
+5. **Commit staged changes**:
+
+   For simple messages:
+
+   ```bash
+   git commit -m "type(scope): description"
+   ```
+
+   For messages with body:
+
+   ```bash
+   git commit
+   ```
+
+   Then provide the full message in the editor, or use:
+
+   ```bash
+   git commit -m "type(scope): description" -m "Body paragraph 1" -m "Body paragraph 2"
+   ```
+
+6. **Handle user-provided context**:
+   - If user provides additional context after the command (e.g., `/commit-conventional fix the login bug`), incorporate it into the commit message
+   - Use the user's description as guidance but ensure it follows Conventional Commits format
+   - If user's description doesn't match the actual staged changes, adjust accordingly
+
+## Quality Checklist
+
+Before committing, verify:
+
+- [ ] Commit type accurately reflects the staged changes
+- [ ] Scope is used appropriately (if needed)
+- [ ] Description is in imperative mood
+- [ ] Description is concise and specific
+- [ ] Breaking changes are properly indicated
+- [ ] Body provides necessary context (if included)
+- [ ] Only staged changes are being committed (no unstaged changes)
+- [ ] Staged changes exist (if none, user has been informed)
+- [ ] Commit message follows Conventional Commits 1.0.0 specification
